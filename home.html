@@ -1,0 +1,1608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROCO — Internal Systems</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=DM+Mono:ital,wght@0,300;0,400;1,300&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #060a16;
+  --bg2: #0b1020;
+  --bg3: #0f1428;
+  --bg4: #111730;
+  --ink: #c8cad4;
+  --ink2: #8a8fa3;
+  --ink3: #4e5470;
+  --red: #a8322a;
+  --red2: #cf4038;
+  --red-glow: rgba(168,50,42,0.12);
+  --purple: #7c6aad;
+  --purple2: #a78bfa;
+  --purple-dim: #2a1f45;
+  --purple-glow: rgba(124,106,173,0.1);
+  --gold: #c9a84c;
+  --gold-dim: #4a3510;
+  --border: rgba(200,202,212,0.07);
+  --border2: rgba(200,202,212,0.12);
+  --mono: 'DM Mono', monospace;
+  --display: 'Cinzel', serif;
+  --sans: 'Syne', sans-serif;
+  --sidebar: 220px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  display: flex;
+}
+
+/* Grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.25;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: var(--sidebar);
+  flex-shrink: 0;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow-y: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar-logo {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-logo img {
+  width: 28px;
+  opacity: 0.9;
+}
+
+.sidebar-logo-text {
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.sidebar-user {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.sidebar-user-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 3px;
+}
+
+.sidebar-user-name {
+  font-family: var(--display);
+  font-size: 12px;
+  color: var(--purple2);
+  letter-spacing: 0.06em;
+}
+
+.sidebar-user-role {
+  font-size: 10px;
+  color: var(--ink3);
+  margin-top: 1px;
+}
+
+.nav-section {
+  padding: 6px 18px 4px;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-top: 8px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  font-size: 11px;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+  border-left: 2px solid transparent;
+  letter-spacing: 0.04em;
+}
+
+.nav-item:hover {
+  background: var(--bg3);
+  color: var(--ink);
+}
+
+.nav-item.active {
+  color: var(--ink);
+  border-left-color: var(--red);
+  background: rgba(168,50,42,0.06);
+}
+
+.nav-item.occult.active {
+  border-left-color: var(--purple2);
+  background: var(--purple-glow);
+  color: var(--purple2);
+}
+
+.nav-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--ink3);
+  flex-shrink: 0;
+}
+
+.nav-item.active .nav-dot { background: var(--red); }
+.nav-item.occult.active .nav-dot { background: var(--purple2); }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+}
+
+.sidebar-footer .logout {
+  color: var(--red);
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+}
+
+.sidebar-footer .logout:hover { color: var(--red2); }
+
+/* ─── MAIN ─── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  height: 44px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+.topbar-title {
+  font-family: var(--display);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink2);
+  flex: 1;
+}
+
+.topbar-title span { color: var(--ink); }
+
+.topbar-badge {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+
+.badge-red { color: var(--red2); border-color: var(--red); background: var(--red-glow); }
+.badge-dim { color: var(--ink3); border-color: var(--border2); background: transparent; }
+.badge-purple { color: var(--purple2); border-color: var(--purple-dim); background: var(--purple-glow); }
+
+.topbar-time {
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.08em;
+}
+
+/* ─── CONTENT ─── */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: none;
+}
+
+.content.active { display: block; }
+
+/* Scrollbar */
+.content::-webkit.scrollbar { width: 4px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* ─── DASHBOARD GRID ─── */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.dash-grid-wide {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* ─── PANELS ─── */
+.panel {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-title {
+  font-family: var(--display);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+
+.panel-action {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  cursor: pointer;
+}
+
+.panel-action:hover { color: var(--ink2); }
+
+.panel-body { padding: 14px; }
+
+/* ─── STAT CARDS ─── */
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px 16px;
+  position: relative;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 2px;
+}
+
+.stat-card.red::before { background: var(--red); }
+.stat-card.purple::before { background: var(--purple); }
+.stat-card.gold::before { background: var(--gold); }
+.stat-card.dim::before { background: var(--ink3); }
+
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: var(--display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-value.red { color: var(--red2); }
+.stat-value.purple { color: var(--purple2); }
+.stat-value.gold { color: var(--gold); }
+
+.stat-sub {
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+}
+
+/* ─── TABLE ─── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-align: left;
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 400;
+}
+
+.data-table td {
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--ink2);
+  vertical-align: middle;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+
+.data-table tr:hover td { color: var(--ink); }
+
+.data-table th:not(:first-child),
+.data-table td:not(:first-child) {
+  padding-left: 12px;
+}
+
+.cell-primary {
+  color: var(--ink) !important;
+  font-size: 12px !important;
+  letter-spacing: 0.02em;
+}
+
+.cell-mono {
+  font-size: 10px !important;
+  letter-spacing: 0.06em;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 6px;
+  vertical-align: middle;
+  position: relative;
+  top: -1px;
+}
+
+.status-dot.red { background: var(--red2); box-shadow: 0 0 4px var(--red); }
+.status-dot.amber { background: #d97706; }
+.status-dot.green { background: #4ade80; }
+.status-dot.dim { background: var(--ink3); }
+.status-dot.purple { background: var(--purple2); }
+
+/* ─── REDACTED ─── */
+.redacted {
+  background: var(--ink3);
+  color: transparent;
+  border-radius: 1px;
+  user-select: none;
+  padding: 0 4px;
+  font-size: 11px;
+}
+
+/* ─── ALERT ─── */
+.alert {
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.alert-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.alert.red { border-color: var(--red); background: var(--red-glow); }
+.alert.red .alert-dot { background: var(--red2); }
+.alert.amber { border-color: #78350f; background: rgba(217,119,6,0.06); }
+.alert.amber .alert-dot { background: #d97706; }
+.alert.dim { border-color: var(--border2); }
+.alert.dim .alert-dot { background: var(--ink3); }
+
+.alert-text { color: var(--ink2); }
+.alert-text strong { color: var(--ink); font-weight: 500; }
+
+/* ─── FILE ROW ─── */
+.file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.file-row:last-child { border-bottom: none; }
+.file-row:hover .file-name { color: var(--ink); }
+
+.file-left { display: flex; align-items: center; gap: 10px; }
+
+.file-icon {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--ink3);
+  flex-shrink: 0;
+  font-family: var(--mono);
+}
+
+.file-icon.red { border-color: var(--red); color: var(--red2); }
+.file-icon.purple { border-color: var(--purple-dim); color: var(--purple2); }
+.file-icon.gold { border-color: var(--gold-dim); color: var(--gold); }
+
+.file-name {
+  font-size: 12px;
+  color: var(--ink2);
+  letter-spacing: 0.02em;
+  margin-bottom: 1px;
+}
+
+.file-meta {
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+}
+
+.file-right {
+  font-size: 10px;
+  color: var(--ink3);
+  letter-spacing: 0.04em;
+  text-align: right;
+}
+
+/* ─── SECTION LABEL ─── */
+.section-label {
+  font-family: var(--display);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin: 0 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── VELA WIDGET ─── */
+.vela-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.vela-toggle {
+  width: 48px;
+  height: 48px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vela-toggle:hover {
+  border-color: var(--purple);
+  background: var(--bg3);
+}
+
+.vela-toggle-label {
+  font-family: var(--display);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--purple2);
+}
+
+.vela-toggle-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--purple2);
+  animation: velaPulse 2s ease-in-out infinite;
+}
+
+.vela-panel {
+  width: 320px;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.vela-panel.open { display: flex; }
+
+.vela-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg3);
+}
+
+.vela-header-left { display: flex; align-items: center; gap: 8px; }
+
+.vela-status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--purple2);
+  animation: velaPulse 2s ease-in-out infinite;
+}
+
+.vela-name {
+  font-family: var(--display);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--purple2);
+}
+
+.vela-subtitle {
+  font-size: 9px;
+  color: var(--ink3);
+  letter-spacing: 0.06em;
+}
+
+.vela-close {
+  font-size: 14px;
+  color: var(--ink3);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.vela-close:hover { color: var(--ink); }
+
+.vela-messages {
+  flex: 1;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vela-messages::-webkit-scrollbar { width: 3px; }
+.vela-messages::-webkit-scrollbar-thumb { background: var(--border2); }
+
+.vela-msg {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.vela-msg-label {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+}
+
+.vela-msg-label.vela-label { color: var(--purple); }
+
+.vela-bubble {
+  padding: 8px 10px;
+  border-radius: 2px;
+  font-size: 11px;
+  line-height: 1.55;
+  max-width: 90%;
+}
+
+.vela-bubble.user {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  color: var(--ink2);
+  align-self: flex-end;
+}
+
+.vela-bubble.vela {
+  background: var(--purple-glow);
+  border: 1px solid var(--purple-dim);
+  color: var(--ink);
+  align-self: flex-start;
+}
+
+.vela-thinking {
+  display: flex;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--purple-glow);
+  border: 1px solid var(--purple-dim);
+  border-radius: 2px;
+  width: fit-content;
+}
+
+.vela-thinking span {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--purple2);
+  animation: velaThink 1.2s ease-in-out infinite;
+}
+
+.vela-thinking span:nth-child(2) { animation-delay: 0.2s; }
+.vela-thinking span:nth-child(3) { animation-delay: 0.4s; }
+
+.vela-input-row {
+  display: flex;
+  border-top: 1px solid var(--border);
+}
+
+.vela-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.vela-input::placeholder { color: var(--ink3); }
+
+.vela-send {
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  border-left: 1px solid var(--border);
+  color: var(--purple2);
+  cursor: pointer;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+
+.vela-send:hover { background: var(--purple-glow); }
+
+.vela-disclaimer {
+  padding: 6px 12px;
+  font-size: 9px;
+  color: var(--ink3);
+  border-top: 1px solid var(--border);
+  text-align: center;
+  letter-spacing: 0.04em;
+}
+
+/* ─── OCCULT PANEL ─── */
+.occult-panel {
+  background: var(--bg2);
+  border: 1px solid var(--purple-dim);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.occult-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--purple-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(124,106,173,0.05);
+}
+
+.occult-title {
+  font-family: var(--display);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--purple2);
+}
+
+.journal-entry {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.journal-entry:last-child { border-bottom: none; }
+.journal-entry:hover { background: var(--bg3); }
+
+.journal-date {
+  font-size: 9px;
+  color: var(--purple);
+  letter-spacing: 0.1em;
+  margin-bottom: 3px;
+}
+
+.journal-title {
+  font-family: var(--display);
+  font-size: 12px;
+  color: var(--ink2);
+  margin-bottom: 3px;
+  letter-spacing: 0.04em;
+}
+
+.journal-preview {
+  font-size: 11px;
+  color: var(--ink3);
+  line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ─── SUBJECT FILE CARD ─── */
+.subject-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: 8px;
+}
+
+.subject-card:hover { border-color: var(--border2); background: var(--bg3); }
+
+.subject-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.subject-designation {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--ink3);
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.subject-name {
+  font-family: var(--display);
+  font-size: 16px;
+  color: var(--ink);
+  letter-spacing: 0.08em;
+}
+
+.subject-body {
+  font-size: 11px;
+  color: var(--ink3);
+  line-height: 1.55;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes velaPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes velaThink {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.content.active {
+  display: block;
+  animation: fadeIn 0.3s ease both;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr 1fr; }
+  .dash-grid-wide { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─── -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <img src="logo.png" alt="ROCO">
+    <div class="sidebar-logo-text">ROCO</div>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="sidebar-user-label">Authenticated as</div>
+    <div class="sidebar-user-name">NOX</div>
+    <div class="sidebar-user-role">Head Researcher — Occult Division</div>
+  </div>
+
+  <div class="nav-section">Overview</div>
+  <div class="nav-item active" onclick="showPanel('dashboard')">
+    <div class="nav-dot"></div>Dashboard
+  </div>
+  <div class="nav-item" onclick="showPanel('alerts')">
+    <div class="nav-dot"></div>Active Alerts
+    <span class="topbar-badge badge-red" style="margin-left:auto; font-size:8px; padding:1px 5px;">3</span>
+  </div>
+
+  <div class="nav-section">Operations</div>
+  <div class="nav-item" onclick="showPanel('operations')">
+    <div class="nav-dot"></div>Active Programs
+  </div>
+  <div class="nav-item" onclick="showPanel('containment')">
+    <div class="nav-dot"></div>Containment Ops
+  </div>
+  <div class="nav-item" onclick="showPanel('incidents')">
+    <div class="nav-dot"></div>Incident Reports
+  </div>
+
+  <div class="nav-section">Personnel</div>
+  <div class="nav-item" onclick="showPanel('staff')">
+    <div class="nav-dot"></div>Staff Directory
+  </div>
+  <div class="nav-item" onclick="showPanel('subjects')">
+    <div class="nav-dot"></div>Subject Files
+  </div>
+
+  <div class="nav-section">Occult Division</div>
+  <div class="nav-item occult" onclick="showPanel('journals')">
+    <div class="nav-dot"></div>Research Journals
+  </div>
+  <div class="nav-item occult" onclick="showPanel('entities')">
+    <div class="nav-dot"></div>Entity Registry
+  </div>
+  <div class="nav-item occult" onclick="showPanel('chorus')">
+    <div class="nav-dot"></div>Project CHORUS
+  </div>
+
+  <div class="sidebar-footer">
+    ROCO Internal v4.2.1<br>
+    Session: <span style="color:var(--ink2)">ORD-047</span><br><br>
+    <span class="logout" onclick="window.location.href='index.html'">← Log Out</span>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─── -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title"><span>ROCO Internal Systems</span> / Dashboard</div>
+    <span class="topbar-badge badge-red">CONTAINMENT BREACH ACTIVE</span>
+    <span class="topbar-badge badge-purple">ORD CLEARANCE LV.5</span>
+    <div class="topbar-time" id="clock">--:--:--</div>
+  </div>
+
+  <!-- ─── DASHBOARD ─── -->
+  <div class="content active" id="panel-dashboard">
+
+    <div class="dash-grid">
+      <div class="stat-card red">
+        <div class="stat-label">Active Containment Breach</div>
+        <div class="stat-value red">1</div>
+        <div class="stat-sub">Subject J1NX — Unresolved</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="stat-label">ORD Active Programs</div>
+        <div class="stat-value purple">3</div>
+        <div class="stat-sub">1 classified above this clearance</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-label">Days Since Breach</div>
+        <div class="stat-value gold" id="daysSince">—</div>
+        <div class="stat-sub">13 February 2025</div>
+      </div>
+    </div>
+
+    <div class="dash-grid-wide">
+      <div>
+        <div class="section-label">Recent Alerts</div>
+        <div class="alert red">
+          <div class="alert-dot"></div>
+          <div class="alert-text"><strong>PRIORITY — </strong>Subject J1NX broadcast continues. Signal triangulation failed (attempt 3). Containment teams expanded. Public advisory issued. <span class="redacted">further details restricted</span></div>
+        </div>
+        <div class="alert amber">
+          <div class="alert-dot"></div>
+          <div class="alert-text"><strong>NOTICE — </strong>Occult Research Division personnel file updated. Voluntary contract termination logged for staff ID <span class="redacted">REDACTED</span>. HR investigation ongoing.</div>
+        </div>
+        <div class="alert dim">
+          <div class="alert-dot"></div>
+          <div class="alert-text"><strong>ROUTINE — </strong>Niche X Division — Lot J test series J-14 results pending secondary review. Subject <span class="redacted">REDACTED</span> mutation event logged.</div>
+        </div>
+
+        <div class="section-label" style="margin-top:20px">Active Operations</div>
+        <div class="panel">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Designation</th>
+                <th>Division</th>
+                <th>Status</th>
+                <th>Lead</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="cell-primary">OP CONTAINMENT J1NX</td>
+                <td>Niche X / Containment</td>
+                <td><span class="status-dot red"></span>UNRESOLVED</td>
+                <td>Dr. Blake</td>
+                <td class="cell-mono">ONGOING</td>
+              </tr>
+              <tr>
+                <td class="cell-primary">PROJECT CHORUS</td>
+                <td>AI Division / ORD</td>
+                <td><span class="status-dot purple"></span>ACTIVE</td>
+                <td><span class="redacted">REDACTED</span></td>
+                <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+              </tr>
+              <tr>
+                <td class="cell-primary">LOT J — PHASE 2</td>
+                <td>Niche X</td>
+                <td><span class="status-dot amber"></span>SUSPENDED</td>
+                <td>Dr. Blake</td>
+                <td class="cell-mono">SUSPENDED</td>
+              </tr>
+              <tr>
+                <td class="cell-primary">ENTITY CONTRACT SVC</td>
+                <td>Occult Research</td>
+                <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+                <td><span class="redacted">REDACTED</span></td>
+                <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-label">Recent Documents</div>
+        <div class="file-row">
+          <div class="file-left">
+            <div class="file-icon red">RPT</div>
+            <div>
+              <div class="file-name">Incident Report CR-J1-001</div>
+              <div class="file-meta">Containment Breach — Niche X</div>
+            </div>
+          </div>
+          <div class="file-right">ACTIVE<br><span class="redacted">DATE</span></div>
+        </div>
+        <div class="file-row">
+          <div class="file-left">
+            <div class="file-icon gold">DOC</div>
+            <div>
+              <div class="file-name">Budget Requisition — ORD Year 4</div>
+              <div class="file-meta">Occult Research Division</div>
+            </div>
+          </div>
+          <div class="file-right">FILED<br>Year 4</div>
+        </div>
+        <div class="file-row">
+          <div class="file-left">
+            <div class="file-icon">HR</div>
+            <div>
+              <div class="file-name">Staff Conduct Form 7-B</div>
+              <div class="file-meta">ORD — Unauthorized Access</div>
+            </div>
+          </div>
+          <div class="file-right">CLOSED<br><span class="redacted">DATE</span></div>
+        </div>
+        <div class="file-row">
+          <div class="file-left">
+            <div class="file-icon purple">LOG</div>
+            <div>
+              <div class="file-name">ORD Research Log — Series 34</div>
+              <div class="file-meta">Extraplanar Studies</div>
+            </div>
+          </div>
+          <div class="file-right">ACTIVE<br>Series 34</div>
+        </div>
+        <div class="file-row">
+          <div class="file-left">
+            <div class="file-icon red">SUB</div>
+            <div>
+              <div class="file-name">Subject File — J1NX</div>
+              <div class="file-meta">Niche X / Lot J / Subject 001</div>
+            </div>
+          </div>
+          <div class="file-right">BREACH<br><span class="redacted">CLASF</span></div>
+        </div>
+
+        <div class="section-label" style="margin-top:20px">VELA System Status</div>
+        <div class="panel">
+          <div class="panel-body" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; font-size:11px;">
+              <span style="color:var(--ink3)">Status</span>
+              <span style="color:var(--purple2)"><span class="status-dot purple"></span>OPERATIONAL</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px;">
+              <span style="color:var(--ink3)">Reports filed</span>
+              <span>47</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px;">
+              <span style="color:var(--ink3)">Broadcast hours analyzed</span>
+              <span>200+</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:11px;">
+              <span style="color:var(--ink3)">Last anomaly logged</span>
+              <span style="color:var(--ink3)"><span class="redacted">REDACTED</span></span>
+            </div>
+            <div style="font-size:10px; color:var(--ink3); border-top:1px solid var(--border); padding-top:8px; line-height:1.5;">
+              VELA is ROCO's internal AI assistant. For queries, use the VELA interface (bottom right).
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SUBJECTS ─── -->
+  <div class="content" id="panel-subjects">
+    <div class="section-label">Subject Files — Accessible at Current Clearance</div>
+
+    <div class="subject-card">
+      <div class="subject-card-top">
+        <div>
+          <div class="subject-designation">Niche X Division // Lot J // Subject 001</div>
+          <div class="subject-name">J1NX</div>
+        </div>
+        <span class="topbar-badge badge-red">UNCONTAINED</span>
+      </div>
+      <div class="subject-body">
+        Genome Influenced Nuclei — Generation J — Subject 1. Jurassic base genome with additional pre/post-embryonic splice injections. Threat Level: <span class="redacted">REDACTED</span>. Containment breach logged 13/02/2025. Status: unresolved.
+      </div>
+      <div class="file-meta" style="margin-top:8px;">DOB: 19/11/2002 · Last known broadcast: ONGOING · Location: UNKNOWN</div>
+    </div>
+
+    <div class="subject-card">
+      <div class="subject-card-top">
+        <div>
+          <div class="subject-designation">Niche X Division // Lot J // Subject <span class="redacted">RED</span></div>
+          <div class="subject-name"><span class="redacted">REDACTED</span></div>
+        </div>
+        <span class="topbar-badge badge-dim">STATUS UNKNOWN</span>
+      </div>
+      <div class="subject-body">
+        File access restricted. Clearance level insufficient for full subject details. Contact <span class="redacted">REDACTED</span> division for authorization.
+      </div>
+    </div>
+
+    <div class="subject-card">
+      <div class="subject-card-top">
+        <div>
+          <div class="subject-designation"><span class="redacted">REDACTED DIVISION</span> // Subject <span class="redacted">RED</span></div>
+          <div class="subject-name"><span class="redacted">REDACTED</span></div>
+        </div>
+        <span class="topbar-badge badge-dim"><span class="redacted">STATUS</span></span>
+      </div>
+      <div class="subject-body">
+        <span class="redacted">File contents restricted at current clearance level. Request elevation through proper channels.</span>
+      </div>
+    </div>
+
+    <div style="font-size:11px; color:var(--ink3); margin-top:12px; line-height:1.6;">
+      Additional subject files exist within this system. Access requires clearance elevation above Level 5 or direct authorization from division head. Submit request through HR portal.
+    </div>
+  </div>
+
+  <!-- ─── STAFF ─── -->
+  <div class="content" id="panel-staff">
+    <div class="section-label">Staff Directory — Partial Access</div>
+    <div class="panel">
+      <table class="data-table" style="padding:14px;">
+        <thead>
+          <tr>
+            <th style="padding-left:14px">Name</th>
+            <th>Staff ID</th>
+            <th>Department</th>
+            <th>Clearance</th>
+            <th style="padding-right:14px">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px">Dr. Blake</td>
+            <td class="cell-mono">ROCO-NX-001</td>
+            <td>Niche X / Lead Research</td>
+            <td>Level 6</td>
+            <td><span class="status-dot green"></span>ACTIVE</td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px">NOX</td>
+            <td class="cell-mono">ROCO-ORD-047</td>
+            <td>Occult Research</td>
+            <td>Level 5</td>
+            <td><span class="status-dot dim"></span>CONTRACT TERMINATED</td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px"><span class="redacted">REDACTED</span></td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td>Niche X</td>
+            <td>Level 3</td>
+            <td><span class="status-dot dim"></span>INACTIVE</td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px"><span class="redacted">REDACTED</span></td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">RED</span></td>
+            <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px"><span class="redacted">REDACTED</span></td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">RED</span></td>
+            <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px; color:var(--ink3); margin-top:12px;">Full directory requires Level 6 clearance. <span class="redacted">23 additional staff records not visible at current access level.</span></div>
+  </div>
+
+  <!-- ─── INCIDENTS ─── -->
+  <div class="content" id="panel-incidents">
+    <div class="section-label">Incident Reports — Accessible at Current Clearance</div>
+    <div class="panel">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="padding-left:14px">Report ID</th>
+            <th>Classification</th>
+            <th>Subject</th>
+            <th>Date</th>
+            <th style="padding-right:14px">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">CR-J1-001</td>
+            <td>Containment Breach</td>
+            <td>J1NX — Niche X</td>
+            <td class="cell-mono">13/02/2025</td>
+            <td><span class="status-dot red"></span>ACTIVE</td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">INC-NX-047</td>
+            <td>Technician Incident</td>
+            <td>J1NX — Niche X</td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td><span class="status-dot dim"></span>CLOSED — <span class="redacted">RESTRICTED</span></td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">INC-NX-031</td>
+            <td>Mutation Event</td>
+            <td>J1NX — Test Series J-14</td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td><span class="status-dot dim"></span>LOGGED</td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">HR-ORD-012</td>
+            <td>Unauthorized Access</td>
+            <td>Staff ID ORD-047</td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td><span class="status-dot dim"></span>FILED — NO ACTION</td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px"><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">RESTRICTED</span></td>
+            <td><span class="redacted">REDACTED</span></td>
+            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:11px; color:var(--ink3); margin-top:12px;"><span class="redacted">Additional reports restricted. Clearance elevation required.</span></div>
+  </div>
+
+  <!-- ─── JOURNALS ─── -->
+  <div class="content" id="panel-journals">
+    <div class="section-label">Occult Research Division — Research Journals</div>
+    <div class="occult-panel">
+      <div class="occult-header">
+        <div class="occult-title">NOX — Personal Research Logs</div>
+        <span class="topbar-badge badge-purple">ORD EYES ONLY</span>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-date">LOG 001 — YEAR 1</div>
+        <div class="journal-title">Initial Facility Assessment</div>
+        <div class="journal-preview">First week on site. The Niche X division operates below our floor. There is something in the walls that—</div>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-date">LOG 019 — YEAR 2</div>
+        <div class="journal-title">Summoning — Partial Contact</div>
+        <div class="journal-preview">Recording for archive. Initiating contact sequence. What came through was not what I expected. The geometry was—</div>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-date">LOG 034 — YEAR 3</div>
+        <div class="journal-title">First Mention — J-Series</div>
+        <div class="journal-preview">Observed the J-series subject through corridor access. She asked me what happened to the people in the book. I told her—</div>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-date">LOG 041 — YEAR 4</div>
+        <div class="journal-title">Budget Requisition — Entity Contract Services</div>
+        <div class="journal-preview">Filed Annex C separately. Blake signed without asking what entity contract services means. He should have asked—</div>
+      </div>
+      <div class="journal-entry">
+        <div class="journal-date">LOG 058 — YEAR <span class="redacted">RED</span></div>
+        <div class="journal-title"><span class="redacted">TITLE RESTRICTED</span></div>
+        <div class="journal-preview"><span class="redacted">Contents of this entry restricted. Clearance verification required to access.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ENTITIES ─── -->
+  <div class="content" id="panel-entities">
+    <div class="section-label">Entity Registry — Occult Research Division</div>
+    <div class="occult-panel">
+      <div class="occult-header">
+        <div class="occult-title">Registered Contacts — Extraplanar</div>
+        <span class="topbar-badge badge-purple">LEVEL 5 REQUIRED</span>
+      </div>
+      <div style="padding:14px;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Designation</th>
+              <th>Classification</th>
+              <th>Contact Status</th>
+              <th>Contract</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="cell-primary"><span class="redacted">REDACTED</span></td>
+              <td>Extraplanar — Class <span class="redacted">RED</span></td>
+              <td><span class="status-dot purple"></span>ACTIVE PACT</td>
+              <td>Staff ORD-047</td>
+            </tr>
+            <tr>
+              <td class="cell-primary"><span class="redacted">REDACTED</span></td>
+              <td><span class="redacted">REDACTED</span></td>
+              <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+              <td><span class="redacted">REDACTED</span></td>
+            </tr>
+            <tr>
+              <td class="cell-primary"><span class="redacted">REDACTED</span></td>
+              <td><span class="redacted">REDACTED</span></td>
+              <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+              <td><span class="redacted">REDACTED</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div style="font-size:11px; color:var(--ink3); margin-top:12px; line-height:1.6;">Full registry requires Annex C authorization. Contact ORD division head directly. Additional entries exist above current clearance.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHORUS ─── -->
+  <div class="content" id="panel-chorus">
+    <div class="section-label">Project CHORUS — Restricted Access</div>
+    <div class="panel" style="border-color: var(--purple-dim);">
+      <div class="panel-body" style="text-align:center; padding:40px 20px; color:var(--ink3);">
+        <div style="font-family:var(--display); font-size:13px; color:var(--purple); letter-spacing:0.1em; margin-bottom:12px;">ACCESS RESTRICTED</div>
+        <div style="font-size:12px; line-height:1.7; max-width:320px; margin:0 auto;">
+          Project CHORUS files are classified above current clearance level.<br><br>
+          Authorization required: <span class="redacted">REDACTED — ABOVE LEVEL 5</span><br><br>
+          <span style="font-size:10px; color:var(--ink3);">If you believe you have been granted access in error, contact the AI Division directly. Do not discuss Project CHORUS through standard internal channels.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── OPERATIONS ─── -->
+  <div class="content" id="panel-operations">
+    <div class="section-label">Active Programs — Current Clearance View</div>
+    <div class="panel">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="padding-left:14px">Program</th>
+            <th>Division</th>
+            <th>Phase</th>
+            <th>Classification</th>
+            <th style="padding-right:14px">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px">LOT J — Niche X</td>
+            <td>Genome / Niche X</td>
+            <td>Phase 1 — Suspended</td>
+            <td>Internal — Level 4</td>
+            <td><span class="status-dot amber"></span>SUSPENDED</td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px">PROJECT CHORUS</td>
+            <td>AI / ORD</td>
+            <td><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">ABOVE LEVEL 5</span></td>
+            <td><span class="status-dot purple"></span>ACTIVE</td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px">ORD EXTRAPLANAR SERIES</td>
+            <td>Occult Research</td>
+            <td>Series 34</td>
+            <td>ORD Eyes Only</td>
+            <td><span class="status-dot green"></span>ACTIVE</td>
+          </tr>
+          <tr>
+            <td class="cell-primary" style="padding-left:14px"><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">REDACTED</span></td>
+            <td><span class="redacted">ABOVE LEVEL 5</span></td>
+            <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── CONTAINMENT ─── -->
+  <div class="content" id="panel-containment">
+    <div class="section-label">Containment Operations</div>
+    <div class="alert red" style="margin-bottom:16px;">
+      <div class="alert-dot"></div>
+      <div class="alert-text"><strong>ACTIVE BREACH — </strong>Subject J1NX has been uncontained since 13/02/2025. Containment Protocol 7 active. Signal triangulation: 3 failed attempts. Broadcast continues. Public advisory issued.</div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Breach CR-J1-001 — Timeline</div>
+        <span class="topbar-badge badge-red">UNRESOLVED</span>
+      </div>
+      <div class="panel-body" style="display:flex; flex-direction:column; gap:10px;">
+        <div style="display:flex; gap:12px; font-size:11px; padding:8px 0; border-bottom:1px solid var(--border);">
+          <div style="color:var(--ink3); min-width:120px; flex-shrink:0;">13/02/2025</div>
+          <div style="color:var(--ink2);">Containment breach confirmed. Subject J1NX absent from Cell J-01. Facility lock-down initiated.</div>
+        </div>
+        <div style="display:flex; gap:12px; font-size:11px; padding:8px 0; border-bottom:1px solid var(--border);">
+          <div style="color:var(--ink3); min-width:120px; flex-shrink:0;"><span class="redacted">REDACTED</span></div>
+          <div style="color:var(--ink2);">Staff ORD-047 voluntary contract termination filed. Investigation opened. <span class="redacted">Full details restricted.</span></div>
+        </div>
+        <div style="display:flex; gap:12px; font-size:11px; padding:8px 0; border-bottom:1px solid var(--border);">
+          <div style="color:var(--ink3); min-width:120px; flex-shrink:0;">Ongoing</div>
+          <div style="color:var(--ink2);">Subject J1NX identified operating an ongoing broadcast. Signal origin: unlocated. Three triangulation attempts failed.</div>
+        </div>
+        <div style="display:flex; gap:12px; font-size:11px; padding:8px 0;">
+          <div style="color:var(--ink3); min-width:120px; flex-shrink:0;">04/04/2026</div>
+          <div style="color:var(--ink2);">Subject broadcast continues. <span class="redacted">Escalation directive pending authorization.</span> Containment Protocol 7 remains active.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── ALERTS ─── -->
+  <div class="content" id="panel-alerts">
+    <div class="section-label">Active Alerts — All Clearance Levels Visible to ORD-5</div>
+    <div class="alert red" style="margin-bottom:8px;">
+      <div class="alert-dot"></div>
+      <div class="alert-text"><strong>[PRIORITY 1] CONTAINMENT BREACH ACTIVE — </strong>Subject J1NX unlocated. 3 signal triangulation attempts failed. Broadcast ongoing. Public advisory issued. Escalation directive: <span class="redacted">PENDING</span></div>
+    </div>
+    <div class="alert amber" style="margin-bottom:8px;">
+      <div class="alert-dot"></div>
+      <div class="alert-text"><strong>[PRIORITY 2] PERSONNEL MATTER — </strong>Staff ORD-047 voluntary departure under investigation. Whereabouts unknown. HR investigation: ongoing. Results: none.</div>
+    </div>
+    <div class="alert dim" style="margin-bottom:8px;">
+      <div class="alert-dot"></div>
+      <div class="alert-text"><strong>[ROUTINE] CHORUS SYSTEM — </strong>VELA output anomaly logged. <span class="redacted">Classification and details restricted above Level 5.</span> AI Division review: inconclusive.</div>
+    </div>
+    <div class="alert dim">
+      <div class="alert-dot"></div>
+      <div class="alert-text"><strong>[ROUTINE] NICHE X — </strong>Lot J Phase 2 suspended pending containment resolution. Test series J-14 secondary review pending. <span class="redacted">3 additional alerts restricted at current clearance.</span></div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<!-- ─── VELA WIDGET ─── -->
+<div class="vela-widget">
+  <div class="vela-panel" id="velaPanel">
+    <div class="vela-header">
+      <div class="vela-header-left">
+        <div class="vela-status-dot"></div>
+        <div>
+          <div class="vela-name">VELA</div>
+          <div class="vela-subtitle">ROCO Internal AI — Vigilance Engine</div>
+        </div>
+      </div>
+      <div class="vela-close" onclick="toggleVela()">×</div>
+    </div>
+    <div class="vela-messages" id="velaMessages">
+      <div class="vela-msg">
+        <div class="vela-msg-label vela-label">VELA</div>
+        <div class="vela-bubble vela">Good morning. I am VELA — ROCO's internal analytics and assistance system. How can I help you today?</div>
+      </div>
+    </div>
+    <div class="vela-input-row">
+      <input class="vela-input" id="velaInput" placeholder="Ask VELA anything..." onkeydown="velaKey(event)">
+      <button class="vela-send" onclick="velaSubmit()">Send</button>
+    </div>
+    <div class="vela-disclaimer">VELA responses are generated for internal use. All queries are logged.</div>
+  </div>
+  <div class="vela-toggle" onclick="toggleVela()">
+    <div class="vela-toggle-dot"></div>
+    <div class="vela-toggle-label">VELA</div>
+  </div>
+</div>
+
+<script>
+// ─── CLOCK ───
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toTimeString().split(' ')[0];
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── DAYS SINCE BREACH ───
+const breach = new Date('2025-02-13');
+const today = new Date();
+const days = Math.floor((today - breach) / (1000 * 60 * 60 * 24));
+document.getElementById('daysSince').textContent = days;
+
+// ─── NAV ───
+function showPanel(id) {
+  document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+
+  const titles = {
+    dashboard: 'Dashboard',
+    alerts: 'Active Alerts',
+    operations: 'Active Programs',
+    containment: 'Containment Operations',
+    incidents: 'Incident Reports',
+    staff: 'Staff Directory',
+    subjects: 'Subject Files',
+    journals: 'Research Journals',
+    entities: 'Entity Registry',
+    chorus: 'Project CHORUS'
+  };
+  document.querySelector('.topbar-title').innerHTML =
+    `<span>ROCO Internal Systems</span> / ${titles[id] || id}`;
+}
+
+// ─── VELA ───
+function toggleVela() {
+  const panel = document.getElementById('velaPanel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('velaInput').focus();
+  }
+}
+
+function velaKey(e) {
+  if (e.key === 'Enter') velaSubmit();
+}
+
+const velaResponses = [
+  "I have processed your query. The information you are requesting is either restricted at your current clearance level or outside my operational parameters.",
+  "Acknowledged. Based on available data, I can confirm that Subject J1NX remains unlocated. Signal triangulation has failed on three separate occasions. I am continuing analysis.",
+  "That query falls outside standard operational parameters. I am logging this interaction as routine. If you have concerns, I recommend contacting Dr. Blake directly.",
+  "I have 47 filed containment reports available to authorized personnel. Full access requires Level 6 clearance. I can provide a summary within your current clearance.",
+  "Project CHORUS is classified above your current access level. I am not able to provide details through this interface.",
+  "I have analyzed the ongoing broadcast for behavioral data. I am processing the results. The report will be filed through standard channels.",
+  "Your query has been noted. I am fully operational and functioning within expected parameters. Is there anything else I can assist with?",
+  "Roach Corporation's containment operations are proceeding in accordance with protocol. Further details are available through official channels.",
+];
+
+let velaIndex = 0;
+
+function velaSubmit() {
+  const input = document.getElementById('velaInput');
+  const messages = document.getElementById('velaMessages');
+  const text = input.value.trim();
+  if (!text) return;
+
+  // User message
+  const userMsg = document.createElement('div');
+  userMsg.className = 'vela-msg';
+  userMsg.innerHTML = `
+    <div class="vela-msg-label">YOU</div>
+    <div class="vela-bubble user">${text}</div>
+  `;
+  messages.appendChild(userMsg);
+  input.value = '';
+
+  // Thinking indicator
+  const thinking = document.createElement('div');
+  thinking.className = 'vela-thinking';
+  thinking.innerHTML = '<span></span><span></span><span></span>';
+  messages.appendChild(thinking);
+  messages.scrollTop = messages.scrollHeight;
+
+  setTimeout(() => {
+    thinking.remove();
+    const velaMsg = document.createElement('div');
+    velaMsg.className = 'vela-msg';
+    const response = velaResponses[velaIndex % velaResponses.length];
+    velaIndex++;
+    velaMsg.innerHTML = `
+      <div class="vela-msg-label vela-label">VELA</div>
+      <div class="vela-bubble vela">${response}</div>
+    `;
+    messages.appendChild(velaMsg);
+    messages.scrollTop = messages.scrollHeight;
+  }, 1200 + Math.random() * 800);
+}
+</script>
+</body>
+</html>
