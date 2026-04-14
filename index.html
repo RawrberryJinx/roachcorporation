@@ -313,71 +313,36 @@
   }
 </style>
 </head>
-<body>
-
 <div class="login-backdrop"></div>
 
-<!-- Corner accents -->
 <div class="corner corner-tl"></div>
 <div class="corner corner-tr"></div>
 <div class="corner corner-bl"></div>
 <div class="corner corner-br"></div>
 
-<!-- Edge text -->
 <div class="edge-text edge-top">ROCO Internal Systems — Authorized Personnel Only</div>
 <div class="edge-text edge-bottom">&copy; Roach Corporation — All rights reserved</div>
 
-<!-- Login -->
 <div class="login-container">
 
-  <!-- Logo placeholder -->
   <div class="login-logo">
-  <img src="logo.png" alt="ROCO" style="width: 80px;">
-  <div class="logo-text">Roach Corporation</div>
-</div>
-    </div>
+    <img src="logo.png" alt="ROCO" style="width: 80px;">
     <div class="logo-text">Roach Corporation</div>
   </div>
 
-  <!-- Form -->
   <div class="login-form" role="form" aria-label="Employee login">
     <div class="field-wrap" id="idWrap">
       <span class="field-prefix">Employee ID</span>
-      <input
-        type="text"
-        class="field-input"
-        id="employeeId"
-        placeholder="Enter ID"
-        autocomplete="off"
-        autocorrect="off"
-        autocapitalize="off"
-        spellcheck="false"
-        aria-label="Employee ID"
-      >
+      <input type="text" class="field-input" id="employeeId" placeholder="Enter ID" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="Employee ID">
     </div>
-
     <div class="field-wrap" id="pwWrap">
       <span class="field-prefix">Password</span>
-      <input
-        type="password"
-        class="field-input"
-        id="passwordField"
-        placeholder="Enter password"
-        autocomplete="off"
-        aria-label="Password"
-      >
+      <input type="password" class="field-input" id="passwordField" placeholder="Enter password" autocomplete="off" aria-label="Password">
     </div>
-
-    <button class="login-btn" id="loginBtn" onclick="handleLogin()">
-      Authenticate
-    </button>
-
-    <div class="login-error" id="loginError" role="alert">
-      Access denied — credentials not recognized.
-    </div>
+    <button class="login-btn" id="loginBtn" onclick="handleLogin()">Authenticate</button>
+    <div class="login-error" id="loginError" role="alert">Access denied — credentials not recognized.</div>
   </div>
 
-  <!-- Tagline -->
   <div class="login-tagline">Elevate. Evolve. Endure.</div>
 
 </div>
