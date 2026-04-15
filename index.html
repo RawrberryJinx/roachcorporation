@@ -374,8 +374,23 @@ function handleLogin() {
     return;
   }
 
-  // Redirect to main site on any login (placeholder authentication)
-  window.location.href = 'home.html';
+  // Only one valid credential pair is accepted
+  const validId = 'MED-77149';
+  const validPassword = 'R0C0PASS';
+
+  if (empId === validId && pw === validPassword) {
+    window.location.href = 'home.html';
+    return;
+  }
+
+  idWrap.classList.add('error');
+  pwWrap.classList.add('error');
+  errorEl.textContent = 'Access denied — credentials not recognized.';
+  errorEl.classList.add('show');
+  setTimeout(() => {
+    idWrap.classList.remove('error');
+    pwWrap.classList.remove('error');
+  }, 600);
 }
 
 // Allow Enter key to submit
