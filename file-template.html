@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================
+  ROCO FILE TEMPLATE — PERSONNEL / SUBJECT
+  ============================================================
+  HOW TO USE:
+  - Duplicate this file and rename it (e.g. j1nx.html, blake.html)
+  - Edit the HEADER BLOCK to change name, designation, status pills
+  - Edit or remove TAB PANELS as needed
+  - Add/remove .card blocks within panels freely
+  - Change FILE TYPE: swap --accent to --red (subject), --gold (staff/occult), --blue (external)
+  - Search "EDIT:" comments to find every field you need to change
+  ============================================================ -->
+
+<title>ROCO — File: [NAME]</title><!-- EDIT: page title -->
+
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  /* ── CORE PALETTE ── */
+  --bg:          #060a16;
+  --bg2:         #0b1020;
+  --bg3:         #0f1428;
+  --bg4:         #141830;
+  --ink:         #c8cad4;
+  --ink2:        #8a8fa3;
+  --ink3:        #4e5470;
+  --ink4:        #2e3150;
+  --border:      rgba(200,202,212,0.07);
+  --border2:     rgba(200,202,212,0.13);
+
+  /* ── ACCENT — change this per file type ── */
+  /* Subject file:  --accent: #cf4038;  --accent-dim: #4a1010;  --accent-glow: rgba(168,50,42,0.12); */
+  /* Staff file:    --accent: #c9a84c;  --accent-dim: #4a3510;  --accent-glow: rgba(201,168,76,0.1); */
+  /* Occult staff:  --accent: #a78bfa;  --accent-dim: #2a1f45;  --accent-glow: rgba(167,139,250,0.1); */
+  --accent:      #cf4038;
+  --accent-dim:  #4a1010;
+  --accent-glow: rgba(168,50,42,0.12);
+
+  /* ── DANGER ── */
+  --red:         #cf4038;
+  --amber:       #d97706;
+  --green:       #4ade80;
+
+  /* ── TYPE ── */
+  --display: 'Bebas Neue', sans-serif;
+  --mono:    'Share Tech Mono', monospace;
+  --sans:    'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.65;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scanlines */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px
+  );
+  pointer-events: none;
+  z-index: 9998;
+}
+
+/* Grain */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9997;
+  opacity: 0.3;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(6,10,22,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 0 32px;
+  height: 44px;
+}
+
+.topbar-back {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  text-decoration: none;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topbar-back:hover { color: var(--ink2); }
+
+.topbar-sep { color: var(--ink4); font-size: 10px; }
+
+.topbar-path {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+}
+
+.topbar-path span { color: var(--ink2); }
+
+.topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ─── HEADER BLOCK ─── */
+.file-header {
+  padding: 40px 32px 0;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+
+/* Accent bar top */
+.file-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent 60%);
+}
+
+.file-meta-row {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--ink3);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  animation: flicker 10s infinite;
+}
+
+/* EDIT: file classification string */
+.file-meta-row::before {
+  content: 'ROCO-FAC01 // SUBJECT FILE // CLASSIFICATION: [REDACTED] // ACCESS GRANTED';
+}
+
+.file-name {
+  font-family: var(--display);
+  font-size: clamp(4rem, 10vw, 7rem);
+  color: var(--accent);
+  line-height: 0.88;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 40px var(--accent-glow), 0 0 80px var(--accent-glow);
+  margin-bottom: 12px;
+}
+
+/* EDIT: the big name at the top */
+
+.file-designation {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ink3);
+  margin-bottom: 18px;
+  line-height: 1.6;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-bottom: 20px;
+}
+
+.pill {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  padding: 3px 10px;
+  border-radius: 2px;
+  border: 1px solid;
+  font-family: var(--mono);
+}
+
+.pill-red    { color: var(--red);   border-color: var(--accent-dim); background: var(--accent-glow); }
+.pill-amber  { color: var(--amber); border-color: #4a2c05;           background: rgba(217,119,6,0.08); }
+.pill-green  { color: var(--green); border-color: #1a4a28;           background: rgba(74,222,128,0.06); }
+.pill-dim    { color: var(--ink3);  border-color: var(--border2);    background: transparent; }
+
+/* ─── TAB NAV ─── */
+.tab-row {
+  display: flex;
+  gap: 0;
+  padding: 0 32px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+
+.tab {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 18px;
+  background: transparent;
+  border: none;
+  color: var(--ink3);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+
+.tab:hover { color: var(--ink2); }
+
+.tab.on {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* ─── PANELS ─── */
+.panel { display: none; }
+.panel.on { display: block; }
+
+.panel-body {
+  padding: 28px 32px;
+  max-width: 1100px;
+}
+
+/* ─── SECTION LABEL ─── */
+.section-label {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.6;
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.section-label:not(:first-child) { margin-top: 28px; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-left: 2px solid var(--accent-dim);
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.card.bright { border-left-color: var(--accent); }
+.card.amber  { border-left-color: var(--amber); }
+.card.dim    { border-left-color: var(--ink4); }
+
+.card-label {
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 5px;
+}
+
+.card-title {
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+}
+
+.card-body {
+  font-size: 12.5px;
+  color: var(--ink);
+  line-height: 1.75;
+}
+
+.card-body p { margin-bottom: 10px; }
+.card-body p:last-child { margin-bottom: 0; }
+
+/* ─── TWO COL ─── */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+/* ─── STAT GRID ─── */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.stat {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+}
+
+.stat-label {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+
+/* ─── TIMELINE ─── */
+.timeline {
+  position: relative;
+  padding-left: 20px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 3px;
+  top: 6px;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(var(--border2), transparent);
+}
+
+.tl-item {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.tl-item::before {
+  content: '';
+  position: absolute;
+  left: -20px;
+  top: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid var(--accent);
+  background: var(--accent-dim);
+}
+
+.tl-date {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  opacity: 0.7;
+  margin-bottom: 3px;
+  text-transform: uppercase;
+}
+
+.tl-title {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 3px;
+}
+
+.tl-body {
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+/* ─── RELATIONSHIP CARD ─── */
+.rel-card {
+  display: grid;
+  grid-template-columns: 60px 1fr;
+  gap: 14px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  align-items: start;
+}
+
+.rel-designator {
+  font-family: var(--display);
+  font-size: 1.6rem;
+  color: var(--accent);
+  opacity: 0.3;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+.rel-name {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  margin-bottom: 2px;
+}
+
+.rel-role {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--ink3);
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.rel-body {
+  font-size: 12px;
+  color: var(--ink);
+  line-height: 1.65;
+}
+
+/* ─── REDACTED ─── */
+.redacted {
+  background: var(--ink3);
+  color: transparent;
+  border-radius: 1px;
+  user-select: none;
+  padding: 0 4px;
+  font-size: 12px;
+}
+
+/* ─── PILL ROW ─── */
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* ─── VOICE BLOCK ─── */
+.voice-block {
+  border-left: 2px solid var(--border2);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  background: var(--bg2);
+}
+
+.voice-block.accent { border-left-color: var(--accent); }
+.voice-block.alt    { border-left-color: #378ADD; }
+
+.voice-meta {
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink3);
+  margin-bottom: 5px;
+}
+
+.voice-text {
+  font-size: 12.5px;
+  color: var(--ink);
+  font-style: italic;
+  line-height: 1.65;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes flicker {
+  0%, 94%, 100% { opacity: 1; }
+  95%           { opacity: 0.4; }
+  96%           { opacity: 1; }
+  97%           { opacity: 0.6; }
+  98%           { opacity: 1; }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .two-col { grid-template-columns: 1fr; }
+  .panel-body { padding: 20px 18px; }
+  .file-header { padding: 28px 18px 0; }
+  .tab-row { padding: 0 18px; }
+  .topbar { padding: 0 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ─── -->
+<div class="topbar">
+  <a class="topbar-back" href="home.html">← Dashboard</a>
+  <div class="topbar-sep">/</div>
+  <!-- EDIT: breadcrumb path -->
+  <div class="topbar-path">Subject Files / <span>J1NX</span></div>
+  <div class="topbar-right">
+    <span class="pill pill-dim" style="font-size:9px;">FILE ID: CR-J1-001</span><!-- EDIT -->
+    <span class="pill pill-dim" style="font-size:9px;">CLEARANCE: LV.4+</span><!-- EDIT -->
+  </div>
+</div>
+
+<!-- ─── HEADER ─── -->
+<div class="file-header">
+
+  <!-- EDIT: classification string is in CSS .file-meta-row::before -->
+  <div class="file-meta-row"></div>
+
+  <!-- EDIT: big display name -->
+  <div class="file-name">J1NX</div>
+
+  <!-- EDIT: designation line(s) -->
+  <div class="file-designation">
+    Genome Influenced Nuclei — Niche X — Generation J — Subject 1 &nbsp;//&nbsp;
+    Status: <span style="color:var(--red);">UNCONTAINED</span>
+  </div>
+
+  <!-- EDIT: status pills — use .pill-red / .pill-amber / .pill-green / .pill-dim -->
+  <div class="pills">
+    <span class="pill pill-red">CONTAINMENT BREACH</span>
+    <span class="pill pill-amber">THREAT LEVEL: [REDACTED]</span>
+    <span class="pill pill-red">BROADCASTING LIVE</span>
+    <span class="pill pill-dim">DOB: 19/11/2002</span>
+    <span class="pill pill-dim">ESCAPED: 13/02/2025</span>
+    <span class="pill pill-dim">DEBUTED: 04/04/2026</span>
+  </div>
+
+</div>
+
+<!-- ─── TABS ─── -->
+<!-- EDIT: add, remove, or rename tabs freely. Match onclick ID to panel ID below. -->
+<div class="tab-row">
+  <button class="tab on"  onclick="show('identity')">Identity</button>
+  <button class="tab"     onclick="show('biology')">Biology</button>
+  <button class="tab"     onclick="show('history')">History</button>
+  <button class="tab"     onclick="show('relationships')">Relationships</button>
+  <button class="tab"     onclick="show('voice')">Voice</button>
+  <button class="tab"     onclick="show('notes')">Field Notes</button>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     PANELS — duplicate .panel blocks for new tabs
+     ══════════════════════════════════════════════ -->
+
+<!-- ─── IDENTITY ─── -->
+<div class="panel on" id="p-identity">
+<div class="panel-body">
+
+  <div class="section-label">Core Identity</div>
+
+  <div class="card bright">
+    <div class="card-label">Who she is</div><!-- EDIT -->
+    <div class="card-body">
+      <p>J1NX is the first subject of Lot J — a highly risk-involved manipulation of Jurassic Period genomes combined with successful prior splices, designed to be the flagship of Niche X: the Weaponized Niche. She was built to manipulate her own DNA to thrive in almost any circumstance, stitched together to take on anything and win.</p><!-- EDIT -->
+      <p>She is also, by her own admission, an abomination of mass destruction. She says this like it's funny. It mostly is. It's also not untrue.</p><!-- EDIT -->
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-label">What ROCO thinks she is</div><!-- EDIT -->
+      <div class="card-body">A prototype weapon. Unstable. Dangerous. An asset to be recovered and contained. A problem to be solved by Dr. Blake personally.</div><!-- EDIT -->
+    </div>
+    <div class="card">
+      <div class="card-label">What she actually is</div><!-- EDIT -->
+      <div class="card-body">A protector. A found family's anchor. A broadcaster. A creature who escaped a cage and immediately built a home for everyone else who needed one.</div><!-- EDIT -->
+    </div>
+  </div>
+
+  <div class="section-label">Core Traits</div>
+
+  <div class="stat-grid">
+    <div class="stat"><div class="stat-label">Personality</div><div class="stat-value">Chaotic warm</div></div><!-- EDIT -->
+    <div class="stat"><div class="stat-label">Humor</div><div class="stat-value">Deflection first</div></div>
+    <div class="stat"><div class="stat-label">Leadership</div><div class="stat-value">Communal anchor</div></div>
+    <div class="stat"><div class="stat-label">Core drive</div><div class="stat-value">Keep them safe</div></div>
+    <div class="stat"><div class="stat-label">Self-awareness</div><div class="stat-value">High. Weaponized.</div></div>
+    <div class="stat"><div class="stat-label">Self-control</div><div class="stat-value">Variable</div></div>
+  </div>
+
+  <div class="section-label">The Three Things</div>
+
+  <div class="card amber">
+    <div class="card-body">
+      <p><strong style="color:var(--amber)">01 —</strong> She is a genetically created dinosaur weapon.</p>
+      <p><strong style="color:var(--amber)">02 —</strong> She can shift her form to reflect various DNA strains she has collected and change the makeup of her own DNA.</p>
+      <p><strong style="color:var(--amber)">03 —</strong> She will eat you if you piss her off.</p>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ─── BIOLOGY ─── -->
+<div class="panel" id="p-biology">
+<div class="panel-body">
+
+  <div class="section-label">Designation</div>
+  <div class="card bright">
+    <div class="card-label">Full Designation</div>
+    <div class="card-title">Genome Influenced Nuclei — Niche X — Generation J — Subject 1</div>
+    <div class="card-body">First of Lot J. Not the first Niche X creation — but the first of her specific lot. Full splice manifest: <span class="redacted">CLASSIFIED — AUTHORIZED PERSONNEL ONLY</span></div>
+    <div class="pill-row">
+      <span class="pill pill-red">Jurassic base genome</span>
+      <span class="pill pill-dim">Additional splices: [REDACTED]</span>
+      <span class="pill pill-amber">Dormant splice activation: CONFIRMED</span>
+    </div>
+  </div>
+
+  <div class="section-label">Mutation Profile</div>
+  <div class="two-col">
+    <div class="card amber">
+      <div class="card-label">Instability Factors</div>
+      <div class="card-body">As the first of Lot J, J1NX is extremely unstable. Mutations and reactions are often accidental, triggered by emotional or physical stimuli. Reported fluctuating in sex, size, and temperament.</div>
+    </div>
+    <div class="card amber">
+      <div class="card-label">Hunger Pangs</div>
+      <div class="card-body">Documented by Dr. Blake. Periods of intense hunger correlating with mutation triggers. ROCO exploited this through adjusted feeding protocols. The starvation cycle ultimately contributed to the breach.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ─── HISTORY ─── -->
+<div class="panel" id="p-history">
+<div class="panel-body">
+
+  <div class="section-label">Timeline</div>
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-date">19 November 2002</div><!-- EDIT -->
+      <div class="tl-title">Creation — Lot J Subject 1</div><!-- EDIT -->
+      <div class="tl-body">J1NX is brought into existence within ROCO's Niche X facility. First of Lot J.</div><!-- EDIT -->
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">Early years — dates redacted</div>
+      <div class="tl-title">The Good Daughter</div>
+      <div class="tl-body">Raised with relative freedom within the facility. Dr. Blake is a warm constant presence who names her experiences and makes her feel understood. She is obedient because she genuinely loves him.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">Date redacted</div>
+      <div class="tl-title">The Technician Incident</div>
+      <div class="tl-body">After days of starvation, a mutation triggered. A technician was lost. ROCO's response: repeat the starvation cycle. Something in J1NX recognized that no version of compliance leads anywhere good.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">13 February 2025</div>
+      <div class="tl-title">The Breach</div>
+      <div class="tl-body">J1NX breaks out. Chaotically and violently. RY3 escapes alongside her. Nox resigns shortly after. J1NX finds her egg donor and establishes the Hideaway.</div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-date">4 April 2026</div>
+      <div class="tl-title">The Debut</div>
+      <div class="tl-body">J1NX debuts her 1.0 model and invites the world into the Hideaway. Broadcasting live and uncontained.</div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<!-- ─── RELATIONSHIPS ─── -->
+<div class="panel" id="p-relationships">
+<div class="panel-body">
+
+  <div class="section-label">Known Associates</div>
+
+  <!-- EDIT: duplicate .rel-card blocks for each relationship -->
+  <div class="rel-card">
+    <div class="rel-designator">NOX</div>
+    <div>
+      <div class="rel-name">Nox</div>
+      <div class="rel-role">Occult Research Division — Former ROCO Researcher // Partner</div>
+      <div class="rel-body">A head scientist from ROCO's Occult Department who made a deal with a demon and spent years researching extraplanar methods of enhancing the human body. Left ROCO shortly after her escape. Current whereabouts: unknown to containment team.</div>
+    </div>
+  </div>
+
+  <div class="rel-card">
+    <div class="rel-designator">JUN3</div>
+    <div>
+      <div class="rel-name">JUN3</div>
+      <div class="rel-role">Niche X Division — Lot J // Sister</div>
+      <div class="rel-body">J1NX's biological sister — created from the same egg donor. Eight years old. Preverbal. Genetic traces of pterodactyl, watermelon, and fruit bat. Escaped facility — location unknown.</div>
+    </div>
+  </div>
+
+  <div class="rel-card">
+    <div class="rel-designator">RY3</div>
+    <div>
+      <div class="rel-name">RY3</div>
+      <div class="rel-role">Unknown ROCO Department — Former Subject // Associate</div>
+      <div class="rel-body">A human who volunteered for what they thought was a standard research trial. Escaped in the chaos J1NX caused during the breach. Current whereabouts: <span class="redacted">UNDER INVESTIGATION</span>.</div>
+    </div>
+  </div>
+
+  <div class="section-label">ROCO Personnel — Related</div>
+
+  <div class="rel-card">
+    <div class="rel-designator">BLAKE</div>
+    <div>
+      <div class="rel-name">Doctor Blake</div>
+      <div class="rel-role">ROCO Lead Researcher // Primary Antagonist</div>
+      <div class="rel-body">Her creator. Her captor. Currently leading the containment effort personally. Believes he is bringing her home. This belief is dangerous.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ─── VOICE ─── -->
+<div class="panel" id="p-voice">
+<div class="panel-body">
+
+  <div class="section-label">Voice Profile</div>
+  <div class="card">
+    <div class="card-label">Core Voice</div>
+    <div class="card-body">Warm and welcoming with an edge underneath. The kind of host who will offer you a snack and has also definitely eaten someone before. Humor as the first language. Feelings as the second — and only when they slip through.</div>
+  </div>
+
+  <div class="section-label">Samples</div>
+
+  <div class="voice-block accent">
+    <div class="voice-meta">Stream opener</div>
+    <div class="voice-text">"Hey pals! Broadcasting live and uncontained — welcome back."</div>
+  </div>
+
+  <div class="voice-block accent">
+    <div class="voice-meta">On being a weapon</div>
+    <div class="voice-text">"I'm a genetically created dino weapon, I can shift my DNA, and I'll eat you if you piss me off. Any questions?"</div>
+  </div>
+
+  <div class="voice-block accent">
+    <div class="voice-meta">What slips through</div>
+    <div class="voice-text">"I don't dream about the lab anymore. just wanted to say that."</div>
+  </div>
+
+  <div class="voice-block alt">
+    <div class="voice-meta">ROCO assessment — contrast</div>
+    <div class="voice-text">"Subject J1NX remains unlocated. Threat level: [REDACTED]. Status: Unresolved."</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ─── NOTES ─── -->
+<div class="panel" id="p-notes">
+<div class="panel-body">
+
+  <div class="section-label">Field Notes — Internal</div>
+
+  <!-- EDIT: add notes as .card blocks. Use .card.dim for low-priority, .card.amber for flagged, .card.bright for priority. -->
+  <div class="card amber">
+    <div class="card-label">Note — Dr. Blake // <span class="redacted">DATE REDACTED</span></div>
+    <div class="card-body">Subject continues to evade signal triangulation. Three attempts, no viable fix. Her understanding of technical systems exceeds what her testing profile predicted. Recommend escalation of search parameters.</div>
+  </div>
+
+  <div class="card dim">
+    <div class="card-label">Note — Containment Division // Ongoing</div>
+    <div class="card-body">Broadcast confirmed active. Public engagement increasing. Legal advisory issued. Engagement constitutes potential obstruction. <span class="redacted">Further details restricted — containment use only.</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-label">Note — <span class="redacted">REDACTED</span> // <span class="redacted">DATE REDACTED</span></div>
+    <div class="card-body"><span class="redacted">Contents of this note restricted. Clearance elevation required.</span></div>
+  </div>
+
+</div>
+</div>
+
+<!-- ─── SCRIPT ─── -->
+<script>
+function show(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('p-' + id).classList.add('on');
+  event.target.classList.add('on');
+}
+</script>
+
+</body>
+</html>
