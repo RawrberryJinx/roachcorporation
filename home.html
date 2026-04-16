@@ -1222,7 +1222,7 @@ body::before {
 
   <!-- ─── INCIDENTS ─── -->
   <div class="content" id="panel-incidents">
-    <div class="section-label">Incident Reports — Accessible at Current Clearance</div>
+    <div class="section-label">Incident Reports — Approved Accessible Reports</div>
     <div class="panel">
       <table class="data-table">
         <thead>
@@ -1231,44 +1231,80 @@ body::before {
             <th>Classification</th>
             <th>Subject</th>
             <th>Date</th>
+            <th>Clearance Level</th>
             <th style="padding-right:14px">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="cell-primary cell-mono" style="padding-left:14px">CR-J1-001</td>
+            <td class="cell-primary cell-mono" style="padding-left:14px">CB-GIN1107-001</td>
             <td>Containment Breach</td>
-            <td>J1NX — Niche X</td>
-            <td class="cell-mono">13/02/2025</td>
-            <td><span class="status-dot red"></span>ACTIVE</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">12/13/2008</td>
+            <td><span class="status-dot dim"></span>RESOLVED</td>
           </tr>
           <tr>
-            <td class="cell-primary cell-mono" style="padding-left:14px">INC-NX-047</td>
-            <td>Technician Incident</td>
-            <td>J1NX — Niche X</td>
-            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
-            <td><span class="status-dot dim"></span>CLOSED — <span class="redacted">RESTRICTED</span></td>
-          </tr>
-          <tr>
-            <td class="cell-primary cell-mono" style="padding-left:14px">INC-NX-031</td>
-            <td>Mutation Event</td>
-            <td>J1NX — Test Series J-14</td>
-            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
+            <td class="cell-primary cell-mono" style="padding-left:14px">FD-GIN1107-001</td>
+            <td>Facility Disturbance</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">03/07/2010</td>
             <td><span class="status-dot dim"></span>LOGGED</td>
           </tr>
           <tr>
-            <td class="cell-primary cell-mono" style="padding-left:14px">HR-ORD-012</td>
-            <td>Unauthorized Access</td>
-            <td>Staff ID MED7719</td>
-            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
-            <td><span class="status-dot dim"></span>FILED — NO ACTION</td>
+            <td class="cell-primary cell-mono" style="padding-left:14px">FD-GIN1107-002</td>
+            <td>Facility Disturbance</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">03/07/2013</td>
+            <td><span class="status-dot dim"></span>LOGGED</td>
           </tr>
           <tr>
-            <td class="cell-primary cell-mono" style="padding-left:14px"><span class="redacted">REDACTED</span></td>
-            <td><span class="redacted">RESTRICTED</span></td>
-            <td><span class="redacted">REDACTED</span></td>
-            <td class="cell-mono"><span class="redacted">REDACTED</span></td>
-            <td><span class="status-dot dim"></span><span class="redacted">REDACTED</span></td>
+            <td class="cell-primary cell-mono" style="padding-left:14px">CB-GIN1107-002</td>
+            <td>Containment Breach</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">09/07/2020</td>
+            <td><span class="status-dot dim"></span>RESOLVED</td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">FD-GIN1107-003</td>
+            <td>Facility Disturbance</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">09/07/2020</td>
+            <td><span class="status-dot dim"></span>LOGGED</td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">FD-GIN1107-004</td>
+            <td>Facility Disturbance</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">08/11/2024</td>
+            <td><span class="status-dot dim"></span>LOGGED</td>
+          </tr>
+           <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">II-MED7719-001</td>
+            <td>Internal Investigation</td>
+            <td>Dr. Nox Akasha</td>
+            <td class="cell-mono">08/24/2024</td>
+            <td><span class="status-dot dim"></span>FILED 06/03/2025</td>
+          </tr>
+           <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">FD-GIN1107-005</td>
+            <td>Facility Disturbance</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">02/13/2025</td>
+            <td><span class="status-dot dim"></span>LOGGED</td>
+          </tr>
+          <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">CB-GIN1107-003</td>
+            <td>Containment Breach</td>
+            <td>J1NX - Niche X</td>
+            <td class="cell-mono">02/13/2025</td>
+            <td><span class="status-dot red"></span>ACTIVE</td>
+          </tr>
+           <tr>
+            <td class="cell-primary cell-mono" style="padding-left:14px">II-MED7719-002</td>
+            <td>Internal Investigation</td>
+            <td>Dr. Nox Akasha</td>
+            <td class="cell-mono">05/20/2025</td>
+            <td><span class="status-dot red"></span>ACTIVE</td>
           </tr>
         </tbody>
       </table>
@@ -1435,7 +1471,7 @@ body::before {
     </div>
     <div class="panel">
       <div class="panel-header">
-        <div class="panel-title">Breach CR-J1-001 — Timeline</div>
+        <div class="panel-title">Breach - CB-GIN1107-003 - Timeline</div>
         <span class="topbar-badge badge-red">UNRESOLVED</span>
       </div>
       <div class="panel-body" style="display:flex; flex-direction:column; gap:10px;">
