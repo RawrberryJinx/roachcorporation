@@ -901,7 +901,7 @@ body::before {
 
   <div class="nav-section">Operations</div>
   <div class="nav-item" onclick="showPanel('operations')">
-    <div class="nav-dot"></div>Active Programs
+    <div class="nav-dot"></div> Programs
   </div>
   <div class="nav-item" onclick="showPanel('containment')">
     <div class="nav-dot"></div>Containment Ops
@@ -1407,7 +1407,7 @@ body::before {
 
   <!-- ─── OPERATIONS ─── -->
   <div class="content" id="panel-operations">
-    <div class="section-label">Active Programs — Current Clearance View</div>
+    <div class="section-label">Programs — Current Clearance View</div>
     <div class="panel">
       <table class="data-table">
         <thead>
@@ -1421,7 +1421,7 @@ body::before {
         </thead>
         <tbody>
           <tr>
-            <td class="cell-primary" style="padding-left:14px">GENOME INFLUENCED NUCEI</td>
+            <td class="cell-primary" style="padding-left:14px">GENOME INFLUENCED NUCLEI</td>
             <td>Niche X</td>
             <td>Generation J — Suspended</td>
             <td>Internal — Level 4</td>
@@ -1454,6 +1454,20 @@ body::before {
             <td><span class="redacted">REDACTED</span></td>
             <td><span class="redacted">ABOVE LEVEL 5</span></td>
             <td><span class="status-dot green"></span>ACTIVE</td>
+          </tr>
+           <tr>
+            <td class="cell-primary" style="padding-left:14px">DIGITAL EVOLUTION PROGRAM</td>
+            <td>HELI</td>
+            <td>Closed</td>
+            <td>Internal — Level 2</td>
+            <td><span class="status-dot dim"></span>COMPLETE</td>
+          </tr>
+           <tr>
+            <td class="cell-primary" style="padding-left:14px">ARTIFICIAL BLUEPRINT ENHANCEMENT</td>
+            <td>Project Eternal</td>
+            <td>Closed</td>
+            <td>Internal — Level 5</td>
+            <td><span class="status-dot dim"></span>RETIRED</td>
           </tr>
         </tbody>
       </table>
@@ -1579,7 +1593,7 @@ function showPanel(id) {
   const titles = {
     dashboard: 'Dashboard',
     alerts: 'Active Alerts',
-    operations: 'Active Programs',
+    operations: 'Programs',
     containment: 'Containment Operations',
     incidents: 'Incident Reports',
     staff: 'Staff Directory',
