@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ROCO — Personnel & Subject Registry</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+  ROCO REGISTRY — HOW TO ADD A NEW CARD
+  ============================================================
+  Copy any <div class="card ..."> block in the #registry section.
+  Edit the data-* attributes to control filtering:
+    data-type="subject"       subject / staff / lead / technician / occult / external / ai
+    data-status="active"      active / breach / terminated / unknown / classified
+    data-access="granted"     granted / restricted / classified
+
+  Edit the card content:
+    .card-img-wrap            swap background-image URL for a real photo
+    .card-id                  file ID / staff ID
+    .card-name                display name
+    .card-role                role / designation line
+    .card-tags                add/remove .tag spans
+    card href attribute       link to the file (only matters if data-access="granted")
+
+  ACCESS LEVELS:
+    data-access="granted"     → clicking opens the file link
+    data-access="restricted"  → clicking opens "request access" modal
+    data-access="classified"  → clicking opens "classified" modal, name is redacted
+  ============================================================ -->
+
+<style>
+:root {
+  --bg:     #060a16;
+  --bg2:    #0b1020;
+  --bg3:    #0f1428;
+  --bg4:    #141830;
+  --ink:    #c8cad4;
+  --ink2:   #8a8fa3;
+  --ink3:   #4e5470;
+  --ink4:   #2a2e48;
+  --border: rgba(200,202,212,0.07);
+  --border2:rgba(200,202,212,0.13);
+
+  --red:    #cf4038;
+  --red2:   #a8322a;
+  --red-dim:#3a1010;
+  --red-glow:rgba(168,50,42,0.12);
+
+  --amber:  #d97706;
+  --amber-dim: #3a2005;
+
+  --green:  #4ade80;
+  --green-dim: #0f3020;
+
+  --purple: #a78bfa;
+  --purple-dim: #2a1f45;
+
+  --gold:   #c9a84c;
+  --gold-dim: #3a2c10;
+
+  --blue:   #60a5fa;
+  --blue-dim: #0c2040;
+
+  --mono:    'Share Tech Mono', monospace;
+  --display: 'Bebas Neue', sans-serif;
+  --sans:    'Syne', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Scanlines */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.07) 2px, rgba(0,0,0,0.07) 4px);
+  pointer-events: none; z-index: 9998;
+}
+
+/* Grain */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 9997; opacity: 0.3;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(6,10,22,0.97);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center;
+  gap: 14px; padding: 0 28px; height: 48px;
+}
+
+.topbar-back {
+  font-size: 10px; letter-spacing: 0.1em;
+  color: var(--ink3); text-decoration: none; transition: color 0.2s;
+  display: flex; align-items: center; gap: 5px;
+}
+.topbar-back:hover { color: var(--ink2); }
+
+.topbar-sep { color: var(--ink4); font-size: 11px; }
+
+.topbar-title {
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.06em; color: var(--ink2);
+}
+.topbar-title span { color: var(--ink); }
+
+.topbar-right {
+  margin-left: auto; display: flex; align-items: center; gap: 10px;
+}
+
+.topbar-count {
+  font-size: 10px; letter-spacing: 0.08em; color: var(--ink3);
+}
+
+.topbar-count span { color: var(--ink2); }
+
+/* ─── CONTROLS ─── */
+.controls {
+  padding: 20px 28px 0;
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 20px;
+  flex-wrap: wrap;
+}
+
+.controls-left { display: flex; flex-direction: column; gap: 14px; }
+
+.registry-heading {
+  font-family: var(--display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--ink);
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+}
+
+.registry-heading span { color: var(--red); }
+
+.registry-sub {
+  font-size: 11px; letter-spacing: 0.06em; color: var(--ink3);
+  line-height: 1.6; max-width: 420px;
+}
+
+/* FILTER BUTTONS */
+.filters {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  padding: 20px 28px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.filter-btn {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  padding: 6px 14px; background: transparent;
+  border: 1px solid var(--border2); color: var(--ink3);
+  cursor: pointer; transition: all 0.15s; border-radius: 2px;
+}
+
+.filter-btn:hover { color: var(--ink2); border-color: var(--border2); background: var(--bg2); }
+
+.filter-btn.active {
+  color: var(--ink);
+  background: var(--bg3);
+  border-color: var(--red);
+}
+
+.filter-btn[data-filter="subject"].active    { border-color: var(--red);    color: var(--red); }
+.filter-btn[data-filter="lead"].active       { border-color: var(--gold);   color: var(--gold); }
+.filter-btn[data-filter="technician"].active { border-color: var(--blue);   color: var(--blue); }
+.filter-btn[data-filter="occult"].active     { border-color: var(--purple); color: var(--purple); }
+.filter-btn[data-filter="ai"].active         { border-color: var(--purple); color: var(--purple); }
+.filter-btn[data-filter="external"].active   { border-color: var(--amber);  color: var(--amber); }
+
+.filter-sep {
+  width: 1px; background: var(--border2);
+  margin: 0 6px; align-self: stretch;
+}
+
+/* ─── SEARCH ─── */
+.search-wrap {
+  position: relative;
+}
+.search-input {
+  background: var(--bg2); border: 1px solid var(--border);
+  color: var(--ink); font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.06em; padding: 7px 14px 7px 32px;
+  outline: none; width: 220px; transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--red); }
+.search-input::placeholder { color: var(--ink3); }
+.search-icon {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px; color: var(--ink3); pointer-events: none;
+}
+
+/* ─── REGISTRY GRID ─── */
+.registry {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  padding: 1px;
+  margin: 0;
+}
+
+/* ─── CARD ─── */
+.card {
+  background: var(--bg2);
+  display: flex; flex-direction: column;
+  cursor: pointer;
+  transition: background 0.2s;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  animation: cardIn 0.3s ease both;
+}
+
+.card:hover { background: var(--bg3); }
+
+.card.hidden { display: none; }
+
+/* Accent line top — color per type */
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--red);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.card:hover::before { transform: scaleX(1); }
+
+.card[data-type="lead"]::before       { background: var(--gold); }
+.card[data-type="technician"]::before { background: var(--blue); }
+.card[data-type="occult"]::before     { background: var(--purple); }
+.card[data-type="ai"]::before         { background: var(--purple); }
+.card[data-type="external"]::before   { background: var(--amber); }
+
+/* ── IMAGE AREA ── */
+.card-img-wrap {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background: var(--bg3);
+  position: relative;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center top;
+  flex-shrink: 0;
+}
+
+/* Placeholder pattern when no image */
+.card-img-wrap::after {
+  content: '';
+  position: absolute; inset: 0;
+  background:
+    repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.012) 10px, rgba(255,255,255,0.012) 20px);
+}
+
+.card-img-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display);
+  font-size: 3.5rem;
+  letter-spacing: 0.1em;
+  color: var(--ink4);
+  user-select: none;
+}
+
+/* Camera ID overlay */
+.card-img-overlay {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  padding: 24px 10px 8px;
+  background: linear-gradient(transparent, rgba(6,10,22,0.85));
+  font-size: 9px; letter-spacing: 0.1em;
+  color: rgba(200,202,212,0.4);
+  z-index: 1;
+}
+
+/* Status dot in corner */
+.card-status-dot {
+  position: absolute; top: 10px; right: 10px;
+  width: 8px; height: 8px; border-radius: 50%;
+  border: 1px solid var(--bg2);
+  z-index: 2;
+}
+.card-status-dot.red    { background: var(--red);    box-shadow: 0 0 6px var(--red); }
+.card-status-dot.amber  { background: var(--amber); }
+.card-status-dot.green  { background: var(--green); }
+.card-status-dot.dim    { background: var(--ink3); }
+.card-status-dot.purple { background: var(--purple); }
+
+/* ── LOCK OVERLAY ── */
+.card-lock {
+  position: absolute; inset: 0;
+  background: rgba(6,10,22,0.72);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 8px;
+  z-index: 3;
+  opacity: 0; transition: opacity 0.2s;
+  backdrop-filter: blur(2px);
+}
+
+.card:hover .card-lock { opacity: 1; }
+
+.lock-icon {
+  font-size: 22px; line-height: 1;
+  filter: grayscale(1);
+}
+
+.lock-label {
+  font-size: 9px; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--ink3);
+  text-align: center;
+}
+
+/* Classified cards — lock always visible, image blurred */
+.card[data-access="classified"] .card-img-wrap {
+  filter: blur(4px) brightness(0.4);
+}
+.card[data-access="classified"] .card-lock {
+  opacity: 1; background: rgba(6,10,22,0.5);
+}
+
+.card[data-access="classified"] .card-name {
+  background: var(--ink3); color: transparent;
+  border-radius: 1px; user-select: none;
+}
+
+.card[data-access="classified"] .card-role,
+.card[data-access="classified"] .card-id,
+.card[data-access="classified"] .card-tags {
+  opacity: 0.3; filter: blur(3px);
+}
+
+/* ── CARD INFO ── */
+.card-info {
+  padding: 12px 14px 14px;
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1;
+  border-top: 1px solid var(--border);
+}
+
+.card-id {
+  font-size: 9px; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--ink3);
+}
+
+.card-name {
+  font-family: var(--sans); font-size: 15px;
+  font-weight: 700; color: var(--ink);
+  letter-spacing: 0.02em; line-height: 1.2;
+}
+
+.card-role {
+  font-size: 11px; color: var(--ink2);
+  line-height: 1.4; margin-top: 2px;
+}
+
+.card-tags {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin-top: 8px;
+}
+
+.tag {
+  font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; padding: 2px 7px;
+  border: 1px solid; border-radius: 2px;
+}
+
+.tag-subject    { color: var(--red);    border-color: var(--red-dim);    background: var(--red-glow); }
+.tag-lead       { color: var(--gold);   border-color: var(--gold-dim);   background: rgba(201,168,76,0.07); }
+.tag-technician { color: var(--blue);   border-color: var(--blue-dim);   background: rgba(96,165,250,0.07); }
+.tag-occult     { color: var(--purple); border-color: var(--purple-dim); background: rgba(167,139,250,0.07); }
+.tag-ai         { color: var(--purple); border-color: var(--purple-dim); background: rgba(167,139,250,0.07); }
+.tag-external   { color: var(--amber);  border-color: var(--amber-dim);  background: rgba(217,119,6,0.07); }
+.tag-breach     { color: var(--red);    border-color: var(--red-dim);    background: var(--red-glow); }
+.tag-terminated { color: var(--ink3);   border-color: var(--ink4);       background: transparent; }
+.tag-active     { color: var(--green);  border-color: var(--green-dim);  background: rgba(74,222,128,0.07); }
+.tag-classified { color: var(--ink3);   border-color: var(--ink4);       background: transparent; }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  display: none;
+  grid-column: 1 / -1;
+  padding: 80px 28px;
+  text-align: center;
+  color: var(--ink3);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  background: var(--bg);
+}
+.empty-state.show { display: block; }
+.empty-state-title {
+  font-family: var(--display); font-size: 2rem;
+  color: var(--ink4); letter-spacing: 0.1em; margin-bottom: 8px;
+}
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,10,22,0.88);
+  z-index: 500;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.modal-overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-top: 2px solid var(--red);
+  max-width: 440px; width: 100%;
+  padding: 28px;
+  transform: translateY(16px);
+  transition: transform 0.25s ease;
+  position: relative;
+}
+
+.modal-overlay.open .modal { transform: translateY(0); }
+
+.modal.classified { border-top-color: var(--purple); }
+
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  font-size: 18px; color: var(--ink3);
+  cursor: pointer; line-height: 1; transition: color 0.15s;
+}
+.modal-close:hover { color: var(--ink); }
+
+.modal-id {
+  font-size: 9px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ink3);
+  margin-bottom: 6px;
+}
+
+.modal-title {
+  font-family: var(--sans); font-size: 18px;
+  font-weight: 700; color: var(--ink);
+  margin-bottom: 14px; letter-spacing: 0.02em;
+}
+
+.modal-body {
+  font-size: 12px; color: var(--ink2);
+  line-height: 1.7; margin-bottom: 20px;
+}
+
+.modal-body strong { color: var(--ink); font-weight: 600; }
+
+.modal-actions { display: flex; gap: 8px; }
+
+.modal-btn {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  padding: 9px 18px; cursor: pointer;
+  border: 1px solid; transition: all 0.2s;
+}
+
+.modal-btn.primary {
+  background: var(--red2); border-color: var(--red2); color: #fff;
+}
+.modal-btn.primary:hover { background: var(--red); border-color: var(--red); }
+
+.modal-btn.secondary {
+  background: transparent; border-color: var(--border2); color: var(--ink3);
+}
+.modal-btn.secondary:hover { color: var(--ink2); border-color: var(--border2); background: var(--bg3); }
+
+.modal-btn.purple-btn {
+  background: transparent; border-color: var(--purple-dim); color: var(--purple);
+}
+.modal-btn.purple-btn:hover { background: rgba(167,139,250,0.08); }
+
+/* ─── ANIMATIONS ─── */
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 700px) {
+  .registry { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+  .topbar { padding: 0 16px; }
+  .controls, .filters { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ─── TOPBAR ─── -->
+<div class="topbar">
+  <a class="topbar-back" href="home.html">← Dashboard</a>
+  <div class="topbar-sep">/</div>
+  <div class="topbar-title">ROCO Registry / <span>Personnel & Subjects</span></div>
+  <div class="topbar-right">
+    <div class="topbar-count">Showing <span id="visibleCount">—</span> of <span id="totalCount">—</span> records</div>
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input class="search-input" id="searchInput" type="text" placeholder="Search registry..." autocomplete="off">
+    </div>
+  </div>
+</div>
+
+<!-- ─── PAGE HEADER ─── -->
+<div class="controls">
+  <div class="controls-left">
+    <div class="registry-heading">ROCO<br><span>Registry</span></div>
+    <div class="registry-sub">Personnel files, subject records, and associated documentation. Access is determined by your current clearance level. Files marked restricted or classified require authorization request through proper channels.</div>
+  </div>
+</div>
+
+<!-- ─── FILTERS ─── -->
+<div class="filters">
+  <button class="filter-btn active" data-filter="all">All Records</button>
+  <div class="filter-sep"></div>
+  <button class="filter-btn" data-filter="subject">Subjects</button>
+  <button class="filter-btn" data-filter="lead">Project Leads</button>
+  <button class="filter-btn" data-filter="technician">Technicians</button>
+  <button class="filter-btn" data-filter="occult">Occult Division</button>
+  <button class="filter-btn" data-filter="ai">AI Systems</button>
+  <button class="filter-btn" data-filter="external">External</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     REGISTRY GRID
+     Add new cards here following the template
+     ══════════════════════════════════════════ -->
+<div class="registry" id="registry">
+
+  <!-- ── J1NX ── SUBJECT / BREACH / GRANTED ── -->
+  <div class="card"
+    data-type="subject"
+    data-status="breach"
+    data-access="granted"
+    data-name="J1NX"
+    href="subjects/j1nx.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/j1nx.png');">
+      <!-- EDIT: replace img/j1nx.png with real image path -->
+      <div class="card-img-placeholder">J1NX</div>
+      <div class="card-status-dot red"></div>
+      <div class="card-img-overlay">CAM-CC-01 // ROCO-FAC01</div>
+      <!-- No lock for granted cards -->
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-NX-J001 // Niche X</div>
+      <div class="card-name">J1NX</div>
+      <div class="card-role">Genome Influenced Nuclei — Lot J — Subject 001</div>
+      <div class="card-tags">
+        <span class="tag tag-subject">Subject</span>
+        <span class="tag tag-breach">Breach Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DR. BLAKE ── LEAD / ACTIVE / GRANTED ── -->
+  <div class="card"
+    data-type="lead"
+    data-status="active"
+    data-access="granted"
+    data-name="Doctor Blake"
+    href="staff/blake.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/blake.png');">
+      <div class="card-img-placeholder">BLK</div>
+      <div class="card-status-dot green"></div>
+      <div class="card-img-overlay">ROCO-FAC01 // PERSONNEL</div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-NX-001 // Niche X</div>
+      <div class="card-name">Dr. Blake</div>
+      <div class="card-role">Lead Researcher — Niche X Division</div>
+      <div class="card-tags">
+        <span class="tag tag-lead">Project Lead</span>
+        <span class="tag tag-active">Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── NOX ── OCCULT / TERMINATED / RESTRICTED ── -->
+  <div class="card"
+    data-type="occult"
+    data-status="terminated"
+    data-access="restricted"
+    data-name="NOX"
+    href="staff/nox.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/nox.png');">
+      <div class="card-img-placeholder">NOX</div>
+      <div class="card-status-dot dim"></div>
+      <div class="card-img-overlay">ROCO-ORD-047 // OCCULT DIV</div>
+      <div class="card-lock">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-label">Restricted<br>Request Access</div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-ORD-047 // Occult Research</div>
+      <div class="card-name">NOX</div>
+      <div class="card-role">Head Researcher — Occult Research Division</div>
+      <div class="card-tags">
+        <span class="tag tag-occult">Occult Div.</span>
+        <span class="tag tag-terminated">Contract Terminated</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VELA ── AI / ACTIVE / GRANTED ── -->
+  <div class="card"
+    data-type="ai"
+    data-status="active"
+    data-access="granted"
+    data-name="VELA"
+    href="staff/vela.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background: linear-gradient(160deg, #0d1228, #1a1040);">
+      <div class="card-img-placeholder" style="color:var(--purple); opacity:0.6; font-size:2rem; letter-spacing:0.2em;">VELA</div>
+      <div class="card-status-dot purple"></div>
+      <div class="card-img-overlay">ROCO-AI-001 // BEHAVIORAL ANALYTICS</div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-AI-001 // AI Division</div>
+      <div class="card-name">VELA</div>
+      <div class="card-role">Vigilance Engine for Logistics and Analysis</div>
+      <div class="card-tags">
+        <span class="tag tag-ai">AI System</span>
+        <span class="tag tag-active">Operational</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── JUN3 ── SUBJECT / BREACH / RESTRICTED ── -->
+  <div class="card"
+    data-type="subject"
+    data-status="breach"
+    data-access="restricted"
+    data-name="JUN3"
+    href="subjects/jun3.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/jun3.png');">
+      <div class="card-img-placeholder">JUN3</div>
+      <div class="card-status-dot red"></div>
+      <div class="card-img-overlay">CAM-CC-07 // ROCO-FAC01</div>
+      <div class="card-lock">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-label">Restricted<br>Request Access</div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-NX-J002 // Niche X</div>
+      <div class="card-name">JUN3</div>
+      <div class="card-role">Niche X Division — Lot J — Subject 002</div>
+      <div class="card-tags">
+        <span class="tag tag-subject">Subject</span>
+        <span class="tag tag-breach">Breach Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RY3 ── SUBJECT / BREACH / RESTRICTED ── -->
+  <div class="card"
+    data-type="subject"
+    data-status="breach"
+    data-access="restricted"
+    data-name="RY3"
+    href="subjects/ry3.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/ry3.png');">
+      <div class="card-img-placeholder">RY3</div>
+      <div class="card-status-dot amber"></div>
+      <div class="card-img-overlay">ROCO-FAC01 // SUBJECT FILE</div>
+      <div class="card-lock">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-label">Restricted<br>Request Access</div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-<span style="background:var(--ink3);color:transparent;border-radius:1px;padding:0 4px;">REDACTED</span></div>
+      <div class="card-name">RY3</div>
+      <div class="card-role">Former Subject — Department: <span style="background:var(--ink3);color:transparent;border-radius:1px;padding:0 3px;">REDACTED</span></div>
+      <div class="card-tags">
+        <span class="tag tag-subject">Subject</span>
+        <span class="tag tag-breach">Uncontained</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CLASSIFIED SUBJECT ── CLASSIFIED ── -->
+  <div class="card"
+    data-type="subject"
+    data-status="classified"
+    data-access="classified"
+    data-name="CLASSIFIED"
+    href="#"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/classified.png');">
+      <div class="card-img-placeholder">???</div>
+      <div class="card-status-dot dim"></div>
+      <div class="card-img-overlay"><span style="opacity:0.3">█████ // ████████</span></div>
+      <div class="card-lock">
+        <div class="lock-icon">⛔</div>
+        <div class="lock-label">Classified<br>Above Current Clearance</div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-██-████</div>
+      <div class="card-name">██████</div>
+      <div class="card-role">████████████████████</div>
+      <div class="card-tags">
+        <span class="tag tag-classified">Classified</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CLASSIFIED STAFF ── CLASSIFIED ── -->
+  <div class="card"
+    data-type="technician"
+    data-status="classified"
+    data-access="classified"
+    data-name="CLASSIFIED"
+    href="#"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/classified2.png');">
+      <div class="card-img-placeholder" style="font-size:1.5rem; letter-spacing:0.2em;">████</div>
+      <div class="card-status-dot dim"></div>
+      <div class="card-img-overlay"><span style="opacity:0.3">████ // █████████</span></div>
+      <div class="card-lock">
+        <div class="lock-icon">⛔</div>
+        <div class="lock-label">Classified<br>Above Current Clearance</div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-██-████</div>
+      <div class="card-name">████████</div>
+      <div class="card-role">████████████████</div>
+      <div class="card-tags">
+        <span class="tag tag-classified">Classified</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TECHNICIAN (placeholder) ── TECHNICIAN / INACTIVE / RESTRICTED ── -->
+  <div class="card"
+    data-type="technician"
+    data-status="inactive"
+    data-access="restricted"
+    data-name="Researcher Unknown"
+    href="staff/researcher-012.html"
+    onclick="openCard(this)">
+    <div class="card-img-wrap" style="background-image: url('img/researcher-012.png');">
+      <div class="card-img-placeholder" style="font-size:1.4rem;">RES<br>012</div>
+      <div class="card-status-dot dim"></div>
+      <div class="card-img-overlay">ROCO-NX-TECH // FAC01</div>
+      <div class="card-lock">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-label">Restricted<br>Request Access</div>
+      </div>
+    </div>
+    <div class="card-info">
+      <div class="card-id">ROCO-NX-TECH-012</div>
+      <div class="card-name"><span style="background:var(--ink3);color:transparent;border-radius:1px;padding:0 60px 0 4px;">REDACTED</span></div>
+      <div class="card-role">Junior Researcher — Niche X Division</div>
+      <div class="card-tags">
+        <span class="tag tag-technician">Technician</span>
+        <span class="tag tag-terminated">Inactive</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── EMPTY STATE (shown when no filter matches) ── -->
+  <div class="empty-state" id="emptyState">
+    <div class="empty-state-title">No Records Found</div>
+    <div>No files match the current filter or search query at your clearance level.</div>
+  </div>
+
+</div><!-- end .registry -->
+
+<!-- ══════════════════════════════════════════
+     MODAL — ACCESS RESTRICTED
+     ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="restrictedModal" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-close" onclick="closeAllModals()">×</div>
+    <div class="modal-id" id="restrictedModalId">FILE ID</div>
+    <div class="modal-title" id="restrictedModalTitle">Access Restricted</div>
+    <div class="modal-body">
+      Your current clearance level does not permit access to this file.<br><br>
+      To request elevated access for this record, submit a formal authorization request through your division lead. <strong>Requests are reviewed by the relevant department head and are not guaranteed.</strong><br><br>
+      Unauthorized attempts to access restricted files are logged and reported.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn primary" onclick="submitAccessRequest()">Submit Access Request</button>
+      <button class="modal-btn secondary" onclick="closeAllModals()">Dismiss</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL — CLASSIFIED
+     ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="classifiedModal" onclick="closeModal(event)">
+  <div class="modal classified" onclick="event.stopPropagation()">
+    <div class="modal-close" onclick="closeAllModals()">×</div>
+    <div class="modal-id">CLASSIFICATION LEVEL: ABOVE CLEARANCE</div>
+    <div class="modal-title">File Not Accessible</div>
+    <div class="modal-body">
+      This record is classified above your current clearance level. <strong>The existence, contents, and designation of this file are not disclosed at your access tier.</strong><br><br>
+      If you believe you have been granted access in error, or if you require this file for an active operational matter, contact your division head directly. Do not discuss classified file designations through standard internal channels.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn purple-btn" onclick="closeAllModals()">Acknowledged</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL — REQUEST SUBMITTED
+     ══════════════════════════════════════════ -->
+<div class="modal-overlay" id="submittedModal" onclick="closeModal(event)">
+  <div class="modal" style="border-top-color:var(--green);" onclick="event.stopPropagation()">
+    <div class="modal-close" onclick="closeAllModals()">×</div>
+    <div class="modal-id">REQUEST SUBMITTED</div>
+    <div class="modal-title">Access Request Logged</div>
+    <div class="modal-body">
+      Your request has been submitted and logged under your session ID. <strong>Response times vary by division and clearance tier.</strong><br><br>
+      You will be notified through standard internal channels if your request is approved or denied. This interaction has been recorded.
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn secondary" onclick="closeAllModals()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CARD CLICK HANDLER ───────────────────────────
+function openCard(card) {
+  const access = card.dataset.access;
+  const href   = card.getAttribute('href');
+  const name   = card.dataset.name;
+  const id     = card.querySelector('.card-id')?.textContent?.trim() || 'FILE ID';
+
+  if (access === 'granted') {
+    if (href && href !== '#') window.location.href = href;
+  } else if (access === 'restricted') {
+    document.getElementById('restrictedModalTitle').textContent = 'Access Restricted — ' + name;
+    document.getElementById('restrictedModalId').textContent = id;
+    document.getElementById('restrictedModal').classList.add('open');
+  } else if (access === 'classified') {
+    document.getElementById('classifiedModal').classList.add('open');
+  }
+}
+
+// ─── MODAL CLOSE ─────────────────────────────────
+function closeModal(event) {
+  if (event.target.classList.contains('modal-overlay')) closeAllModals();
+}
+
+function closeAllModals() {
+  document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open'));
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeAllModals();
+});
+
+function submitAccessRequest() {
+  document.getElementById('restrictedModal').classList.remove('open');
+  setTimeout(() => {
+    document.getElementById('submittedModal').classList.add('open');
+  }, 180);
+}
+
+// ─── FILTER ──────────────────────────────────────
+const filterBtns = document.querySelectorAll('.filter-btn');
+let currentFilter = 'all';
+let currentSearch = '';
+
+filterBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filterBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.filter;
+    applyFilters();
+  });
+});
+
+// ─── SEARCH ──────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', function() {
+  currentSearch = this.value.toLowerCase().trim();
+  applyFilters();
+});
+
+// ─── APPLY FILTERS ────────────────────────────────
+function applyFilters() {
+  const cards = document.querySelectorAll('.card:not(.empty-state)');
+  let visible = 0;
+
+  cards.forEach(card => {
+    const typeMatch   = currentFilter === 'all' || card.dataset.type === currentFilter;
+    const searchMatch = currentSearch === '' ||
+      card.dataset.name.toLowerCase().includes(currentSearch) ||
+      (card.querySelector('.card-role')?.textContent || '').toLowerCase().includes(currentSearch) ||
+      (card.querySelector('.card-id')?.textContent || '').toLowerCase().includes(currentSearch);
+
+    if (typeMatch && searchMatch) {
+      card.classList.remove('hidden');
+      card.style.animationDelay = (visible * 30) + 'ms';
+      visible++;
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+
+  document.getElementById('visibleCount').textContent = visible;
+  document.getElementById('emptyState').classList.toggle('show', visible === 0);
+}
+
+// ─── INIT ─────────────────────────────────────────
+(function init() {
+  const cards = document.querySelectorAll('.card:not(.empty-state)');
+  document.getElementById('totalCount').textContent = cards.length;
+  document.getElementById('visibleCount').textContent = cards.length;
+})();
+</script>
+</body>
+</html>
